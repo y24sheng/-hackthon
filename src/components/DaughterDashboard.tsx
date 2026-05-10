@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserProfile, Record as RecordType } from '../types';
+import { UserProfile, MessageRecord as RecordType } from '../types';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, orderBy, onSnapshot, limit } from 'firebase/firestore';
 import { summarizeForDaughter } from '../services/gemini';
@@ -117,10 +117,10 @@ export function DaughterDashboard({ profile }: DaughterDashboardProps) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-[#606C38]" />
-            <h3 className="font-semibold text-[#283618]">妈妈的讯息</h3>
+            <h3 className="font-semibold text-[#283618]">温暖足迹</h3>
           </div>
           <div className="px-3 py-1 rounded-full bg-[#FEFAE0] border border-[#E2E8CE] text-[10px] text-[#BC6C25] font-bold">
-            {records.length} 条待读
+            {records.length} 条记录
           </div>
         </div>
         <Timeline 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserProfile, Record as RecordType } from '../types';
+import { UserProfile, MessageRecord as RecordType } from '../types';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { motion } from 'motion/react';
@@ -54,9 +54,14 @@ export function MotherDashboard({ profile }: MotherDashboardProps) {
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center gap-2 mb-4">
-          <MessageCircle className="w-5 h-5 text-[#606C38]" />
-          <h3 className="font-semibold text-[#283618]">最近的沟通</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-[#606C38]" />
+            <h3 className="font-semibold text-[#283618]">沟通足迹</h3>
+          </div>
+          <div className="px-3 py-1 rounded-full bg-[#FEFAE0] border border-[#E2E8CE] text-[10px] text-[#BC6C25] font-bold">
+            {records.length} 条记录
+          </div>
         </div>
         <Timeline 
           records={records} 

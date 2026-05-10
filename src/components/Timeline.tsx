@@ -1,4 +1,4 @@
-import { Record as RecordType } from '../types';
+import { MessageRecord as RecordType } from '../types';
 import { RecordCard } from './RecordCard';
 import { motion } from 'motion/react';
 

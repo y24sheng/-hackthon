@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Record as RecordType, Feedback, FeedbackType } from '../types';
+import { MessageRecord as RecordType, Feedback, FeedbackType } from '../types';
 import { db } from '../lib/firebase';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'motion/react';
@@ -16,6 +16,7 @@ interface RecordCardProps {
 export function RecordCard({ record, familyId, role, currentUserUid }: RecordCardProps) {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [sending, setSending] = useState(false);
+  const [showAnxiety, setShowAnxiety] = useState(false);
   const isAuthor = record.authorId === currentUserUid;
 
   useEffect(() => {
@@ -60,21 +61,29 @@ export function RecordCard({ record, familyId, role, currentUserUid }: RecordCar
     )}>
       <div className="flex justify-between items-start mb-4">
         <div>
-          <span className={cn(
-            "text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-md mb-2 inline-block",
-            isHold ? "bg-[#FDEBD0] text-[#BC6C25]" : "bg-[#F0EBE3] text-[#606C38]"
-          )}>
-            {isHold ? "克制的爱" : "关心寄语"}
-          </span>
+          {isHold && (
+            <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-md mb-2 inline-block bg-[#FDEBD0] text-[#BC6C25]">
+              克制的爱
+            </span>
+          )}
           <div className="text-xs text-[#A3B18A]">
-            {new Date(record.createdAt?.seconds * 1000 || Date.now()).toLocaleString('zh-CN')}
+            {(() => {
+              const ts = record.createdAt;
+              const date = ts?.toDate ? ts.toDate() : (ts?.seconds ? new Date(ts.seconds * 1000) : new Date());
+              return date.toLocaleString('zh-CN');
+            })()}
           </div>
         </div>
-        {record.anxietyScore > 0 && role === 'mother' && (
-          <div className="flex items-center gap-1 text-[#BC6C25]">
-             <Info className="w-3 h-3" />
-             <span className="text-[10px] font-medium">AI 评估焦虑度: {record.anxietyScore}</span>
-          </div>
+        {record.anxietyScore > 0 && (
+          <button 
+            onClick={() => setShowAnxiety(!showAnxiety)}
+            className="flex items-center gap-2 text-[#BC6C25] hover:opacity-80 transition-all p-1.5 rounded-lg border border-transparent hover:border-[#FDEBD0] hover:bg-white/50"
+          >
+             <Info className="w-3.5 h-3.5" />
+             <span className="text-[10px] font-medium">
+               {showAnxiety ? `AI 评估焦虑度: ${record.anxietyScore}` : '点击查看焦虑指数'}
+             </span>
+          </button>
         )}
       </div>
 
@@ -106,7 +115,11 @@ export function RecordCard({ record, familyId, role, currentUserUid }: RecordCar
             <div className="bg-[#FEFAE0] p-3 rounded-2xl rounded-tl-none border border-[#E2E8CE] shadow-sm">
                 <p className="text-sm text-[#283618] font-medium">{f.translatedMessage}</p>
                 <p className="text-[9px] text-[#A3B18A] mt-1">
-                   {new Date(f.createdAt?.seconds * 1000 || Date.now()).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                   {(() => {
+                     const ts = f.createdAt;
+                     const date = ts?.toDate ? ts.toDate() : (ts?.seconds ? new Date(ts.seconds * 1000) : new Date());
+                     return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                   })()}
                 </p>
             </div>
           </motion.div>

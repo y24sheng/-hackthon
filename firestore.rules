@@ -25,7 +25,7 @@ service cloud.firestore {
     // Entity Validations
     // -------------------------------------------------------------------------
     function isValidUser(data) {
-      return data.uid == request.auth.uid &&
+      return (data.uid == request.auth.uid || !('uid' in data)) &&
              data.role in ['mother', 'child'] &&
              data.familyId is string &&
              data.familyId.size() <= 128;

@@ -11,9 +11,10 @@ export interface UserProfile {
 
 export type RecordType = 'mood' | 'hold' | 'challenge';
 
-export interface Record {
+export interface MessageRecord {
   id: string;
   authorId: string;
+  authorRole?: Role;
   familyId: string;
   type: RecordType;
   content: string;
@@ -23,7 +24,7 @@ export interface Record {
   translatedContent?: string;
   isSent: boolean;
   scheduledAt?: string;
-  createdAt: string;
+  createdAt: any;
 }
 
 export type FeedbackType = 'read' | 'hug' | 'thinking';

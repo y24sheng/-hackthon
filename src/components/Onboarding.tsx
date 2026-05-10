@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { User } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -15,10 +15,12 @@ export function Onboarding({ user, onComplete }: OnboardingProps) {
   const [role, setRole] = useState<Role | null>(null);
   const [familyId, setFamilyId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!role || !familyId) return;
     setLoading(true);
+    setError(null);
     try {
       const newProfile: UserProfile = {
         uid: user.uid,
@@ -30,8 +32,9 @@ export function Onboarding({ user, onComplete }: OnboardingProps) {
       };
       await setDoc(doc(db, 'users', user.uid), newProfile);
       onComplete(newProfile);
-    } catch (error) {
-      console.error("Onboarding error:", error);
+    } catch (err: any) {
+      console.error("Onboarding error:", err);
+      setError(err.message || "保存失败，请检查网络后重试");
     } finally {
       setLoading(false);
     }
@@ -86,6 +89,16 @@ export function Onboarding({ user, onComplete }: OnboardingProps) {
             {loading ? '保存中...' : '进入空间'}
             {!loading && <ArrowRight className="w-5 h-5" />}
           </button>
+
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm text-center"
+            >
+              {error}
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </div>

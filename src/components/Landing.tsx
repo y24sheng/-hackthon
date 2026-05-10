@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, MessageSquareHeart, Sparkles } from 'lucide-react';
 
@@ -40,7 +41,7 @@ export function Landing({ onSignIn }: LandingProps) {
         </h1>
         
         <p className="text-lg text-[#6B705C] mb-12 leading-relaxed">
-          「Moments · 之间」是一个专为东亚母女设计的轻量沟通工具。
+          「懂懂·Wo men」是一个专为东亚母女设计的轻量沟通工具。
           我们存放说不出口的爱，翻译听不懂的焦虑，沉淀忘不掉的回忆。
         </p>
 

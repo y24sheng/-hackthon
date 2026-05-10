@@ -69,17 +69,16 @@ export default function App() {
     <div className="min-h-screen bg-[#FDFCFB] text-[#4A4A4A] font-sans selection:bg-[#E2E8CE]">
       <AnimatePresence mode="wait">
         {!user ? (
-          <Landing key="landing" onSignIn={signInWithGoogle} />
+          <Landing onSignIn={signInWithGoogle} />
         ) : !profile ? (
           <Onboarding 
-            key="onboarding" 
             user={user} 
             onComplete={(newProfile) => setProfile(newProfile)} 
           />
         ) : (
           <div key="dashboard" className="relative pb-20 md:pb-0">
              <header className="px-6 py-4 flex justify-between items-center border-b border-[#F0EBE3]">
-                <h1 className="text-xl font-medium tracking-tight text-[#606C38]">Moments · 之间</h1>
+                <h1 className="text-xl font-medium tracking-tight text-[#606C38]">懂懂·Wo men</h1>
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={toggleRole}
