@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-primary-50: #FDFCFB;
+  --color-primary-100: #F0EBE3;
+  --color-primary-200: #E2E8CE;
+  --color-primary-300: #94A684;
+  --color-primary-400: #606C38;
+  --color-primary-500: #283618;
+  
+  --color-accent-gold: #DDA15E;
+  --color-accent-brown: #BC6C25;
+}
+
+@layer base {
+  body {
+    @apply antialiased bg-[#FDFCFB] text-[#4A4A4A];
+  }
+}
+

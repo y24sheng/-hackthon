@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and role metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["mother", "child"] },
+        "familyId": { "type": "string" },
+        "settings": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "familyId"]
+    },
+    "Record": {
+      "title": "Communication Record",
+      "description": "A message, thought, or 'holding back' record",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "familyId": { "type": "string" },
+        "type": { "type": "string", "enum": ["mood", "hold", "challenge"] },
+        "content": { "type": "string" },
+        "originalContent": { "type": "string", "description": "Raw input if translated" },
+        "anxietyScore": { "type": "number", "minimum": 1, "maximum": 10 },
+        "anxietyWords": { "type": "array", "items": { "type": "string" } },
+        "translatedContent": { "type": "string", "description": "Gentle version" },
+        "isSent": { "type": "boolean" },
+        "scheduledAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "familyId", "type", "content", "createdAt"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Quick reaction from child to mother's record",
+      "type": "object",
+      "properties": {
+        "recordId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "type": { "type": "string", "enum": ["read", "hug", "thinking"] },
+        "translatedMessage": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["recordId", "authorId", "type", "createdAt"]
+    },
+    "Challenge": {
+      "title": "Family Challenge",
+      "description": "Lightweight interaction tasks",
+      "type": "object",
+      "properties": {
+        "familyId": { "type": "string" },
+        "content": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "completed"] },
+        "completedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["familyId", "content", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/families/{familyId}": {
+      "schema": { "type": "object", "properties": { "members": { "type": "array", "items": { "type": "string" } } } },
+      "description": "Family groups"
+    },
+    "/families/{familyId}/records/{recordId}": {
+      "schema": "Record",
+      "description": "Communication records within a family"
+    },
+    "/families/{familyId}/records/{recordId}/feedbacks/{feedbackId}": {
+      "schema": "Feedback",
+      "description": "Feedbacks/reactions to specific records"
+    },
+    "/families/{familyId}/challenges/{challengeId}": {
+      "schema": "Challenge",
+      "description": "Family interaction challenges"
+    }
+  }
+}

@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isFamilyMember(familyId) {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.familyId == familyId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // -------------------------------------------------------------------------
+    // Entity Validations
+    // -------------------------------------------------------------------------
+    function isValidUser(data) {
+      return data.uid == request.auth.uid &&
+             data.role in ['mother', 'child'] &&
+             data.familyId is string &&
+             data.familyId.size() <= 128;
+    }
+
+    function isValidRecord(data) {
+      return data.authorId == request.auth.uid &&
+             data.familyId is string &&
+             data.type in ['mood', 'hold', 'challenge'] &&
+             data.content is string && data.content.size() <= 5000 &&
+             data.createdAt == request.time;
+    }
+
+    function isValidFeedback(data) {
+      return data.authorId == request.auth.uid &&
+             data.type in ['read', 'hug', 'thinking'] &&
+             data.createdAt == request.time;
+    }
+
+    // -------------------------------------------------------------------------
+    // Match Blocks
+    // -------------------------------------------------------------------------
+    
+    // Global Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['settings', 'familyId', 'role']);
+    }
+
+    match /families/{familyId} {
+      allow create: if isSignedIn();
+      allow get: if isFamilyMember(familyId);
+      
+      match /records/{recordId} {
+        allow list, get: if isFamilyMember(familyId);
+        allow create: if isFamilyMember(familyId) && isValidRecord(request.resource.data);
+        allow update: if isFamilyMember(familyId) && 
+                        (request.auth.uid == resource.data.authorId || isFamilyMember(familyId)) &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasAny(['translatedContent', 'anxietyScore', 'anxietyWords', 'isSent']);
+      }
+
+      match /records/{recordId}/feedbacks/{feedbackId} {
+        allow list, get: if isFamilyMember(familyId);
+        allow create: if isFamilyMember(familyId) && isValidFeedback(request.resource.data);
+      }
+
+      match /challenges/{challengeId} {
+        allow list, get: if isFamilyMember(familyId);
+        allow create: if isFamilyMember(familyId);
+        allow update: if isFamilyMember(familyId) && 
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'completedBy']);
+      }
+    }
+  }
+}
